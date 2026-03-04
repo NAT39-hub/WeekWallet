@@ -54,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: any) => formatVND(Number(value) || 0)}
+                  <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: any) => formatVND(Number(value) || 0)} />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ color: textColor }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -66,5 +66,4 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
       </div>
     </div>
   );
-
 };
