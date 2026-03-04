@@ -32,7 +32,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
               <BarChart data={stats.dailyBreakdown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: textColor }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: textColor }} tickFormatter={(value) => `${value / 1000}k`} />
-                <Tooltip cursor={{ fill: isDarkMode ? '#374151' : '#f1f5f9' }} contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: number) => [formatVND(value), 'Chi tiêu']} />
+                <Tooltip cursor={{ fill: isDarkMode ? '#374151' : '#f1f5f9' }} contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: any) => [formatVND(Number(value) || 0), 'Chi tiêu']} />
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                   {stats.dailyBreakdown.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.amount > 0 ? '#3b82f6' : barBg} />
@@ -54,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: number) => formatVND(value)} />
+                  <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderRadius: '8px', border: `1px solid ${tooltipBorder}`, color: tooltipText }} itemStyle={{ color: tooltipText }} formatter={(value: any) => formatVND(Number(value) || 0)}
                   <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ color: textColor }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -66,4 +66,5 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
       </div>
     </div>
   );
+
 };
