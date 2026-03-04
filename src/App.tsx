@@ -6,7 +6,7 @@ import { TransactionForm } from './components/TransactionForm';
 import { TransactionList } from './components/TransactionList';
 import { AIAdvisor } from './components/AIAdvisor';
 import { Wallet, LogOut, Settings, Sun, Moon } from 'lucide-react';
-
+import { MarketData } from './components/MarketData';
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -69,6 +69,7 @@ export default function App() {
   };
 
   return (
+    <MarketData />
     <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100 selection:bg-blue-100 dark:selection:bg-blue-900/50 selection:text-blue-900 dark:selection:text-blue-100 transition-colors duration-200">
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 shadow-sm transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
