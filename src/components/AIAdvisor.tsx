@@ -55,7 +55,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-xl dark:shadow-2xl rounded-2xl bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl transition-colors duration-200">

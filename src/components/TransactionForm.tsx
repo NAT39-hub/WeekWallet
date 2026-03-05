@@ -26,7 +26,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onAdd }) => {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl p-6 transition-all duration-300 relative overflow-hidden group">
+    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-xl dark:shadow-2xl rounded-2xl p-6 transition-all duration-300 relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-500/10 transition-colors"></div>
       <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6 flex items-center">
         <PlusCircle className="w-5 h-5 mr-2 text-blue-500" />
