@@ -19,13 +19,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
 
   return (
     <div className="space-y-6">
-      <div className="glass-card p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
+      <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Tổng chi tiêu tuần này</h2>
         <div className="text-4xl font-light text-gray-900 dark:text-white">{formatVND(stats.total)}</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-card p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
+        <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
           <h3 className="text-base font-medium text-gray-800 dark:text-gray-100 mb-4">Chi tiêu theo ngày</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -43,7 +43,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, isDarkMode }) => {
           </div>
         </div>
 
-        <div className="glass-card p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
+        <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
           <h3 className="text-base font-medium text-gray-800 dark:text-gray-100 mb-4">Cơ cấu chi tiêu</h3>
           {stats.categoryBreakdown.length > 0 ? (
             <div className="h-64">

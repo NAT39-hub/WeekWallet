@@ -55,7 +55,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
   };
 
   return (
-    <div className="glass-card bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl transition-colors duration-200">
@@ -72,7 +72,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
       </div>
       {error && <div className="mt-4 p-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm border border-red-100 dark:border-red-500/20 transition-colors duration-200">{error}</div>}
       {advice && !loading && (
-        <div className="mt-6 p-5 glass dark:bg-gray-900/50 rounded-xl relative overflow-hidden transition-all duration-300 animate-fade-in-up">
+        <div className="mt-6 p-5 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-xl relative overflow-hidden transition-all duration-300 animate-fade-in-up">
           <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-blue-400"></div>
           <p className="text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-line text-sm">{advice}</p>
         </div>

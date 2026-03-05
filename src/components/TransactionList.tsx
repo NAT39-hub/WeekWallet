@@ -33,7 +33,7 @@ const getCategoryBg = (category: string) => {
 export const TransactionList: React.FC<TransactionListProps> = ({ transactions, onDelete }) => {
   if (transactions.length === 0) {
     return (
-      <div className="glass-card p-8 text-center transition-all duration-300">
+      <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl p-8 text-center transition-all duration-300">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 mb-4 shadow-inner">
           <FileText className="w-8 h-8 text-blue-300 dark:text-blue-500" />
         </div>
@@ -44,7 +44,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
   }
 
   return (
-    <div className="glass-card overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
+    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
       <div className="px-6 py-5 border-b border-gray-100/50 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Lịch sử chi tiêu</h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">{transactions.length} giao dịch</span>
