@@ -13,7 +13,7 @@ export const MarketData: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      
+
       // --- 1. LẤY TỶ GIÁ USD (Dùng API ổn định hơn) ---
       try {
         const fallbackRes = await fetch('https://open.er-api.com/v6/latest/USD');
@@ -33,13 +33,13 @@ export const MarketData: React.FC = () => {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ method: 'GetSJCGoldPriceByDate' })
         });
-        
+
         const goldData = await goldRes.json();
         if (goldData && goldData.success && goldData.data) {
-          const hcmGold = goldData.data.find((item: any) => 
+          const hcmGold = goldData.data.find((item: any) =>
             item.BranchName === 'Hồ Chí Minh' && item.TypeName.includes('SJC 1L')
           );
-          
+
           if (hcmGold && hcmGold.Sell) {
             setGold(`${hcmGold.Sell} VNĐ/lượng`);
           } else if (goldData.data.length > 0 && goldData.data[0].Sell) {
@@ -48,7 +48,7 @@ export const MarketData: React.FC = () => {
             setGold('Không tìm thấy giá');
           }
         } else {
-           setGold('Lỗi dữ liệu');
+          setGold('Lỗi dữ liệu');
         }
       } catch (error) {
         console.error("Lỗi khi lấy Vàng (thường do CORS):", error);
@@ -59,7 +59,7 @@ export const MarketData: React.FC = () => {
       try {
         const silverRes = await fetch('https://api.codetabs.com/v1/proxy?quest=https://giabac.doji.vn/data/DataBac9991Luong.txt');
         const silverText = await silverRes.text();
-        
+
         const lines = silverText.trim().split('\n');
         if (lines.length > 0) {
           const lastLine = lines[lines.length - 1];
@@ -87,20 +87,10 @@ export const MarketData: React.FC = () => {
 
     // Gọi hàm lấy dữ liệu ngay lập tức
     fetchData();
-    
-    // 3. Thiết lập tự động cập nhật lại mỗi 5 phút (300,000 milliseconds)
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    
-    // Cleanup function: Xóa bộ đếm thời gian khi component bị hủy
-    return () => clearInterval(interval);
-  }, []);
 
-    // Gọi hàm lấy dữ liệu ngay lập tức
-    fetchData();
-    
     // 3. Thiết lập tự động cập nhật lại mỗi 5 phút (300,000 milliseconds)
     const interval = setInterval(fetchData, 5 * 60 * 1000);
-    
+
     // Cleanup function: Xóa bộ đếm thời gian khi component bị hủy
     return () => clearInterval(interval);
   }, []);
@@ -118,7 +108,7 @@ export const MarketData: React.FC = () => {
           </span>
         </div>
       </div>
-      
+
       {/* Đường gạch dọc phân cách */}
       <div className="w-px h-6 bg-gray-200 dark:bg-gray-800"></div>
 

@@ -33,19 +33,19 @@ const getCategoryBg = (category: string) => {
 export const TransactionList: React.FC<TransactionListProps> = ({ transactions, onDelete }) => {
   if (transactions.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-800 text-center transition-colors duration-200">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800 mb-4 transition-colors duration-200">
-          <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+      <div className="glass-card p-8 text-center transition-all duration-300">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 mb-4 shadow-inner">
+          <FileText className="w-8 h-8 text-blue-300 dark:text-blue-500" />
         </div>
-        <p className="text-gray-500 dark:text-gray-400 font-medium">Chưa có giao dịch nào</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Hãy thêm chi tiêu đầu tiên của bạn</p>
+        <p className="text-gray-600 dark:text-gray-300 font-medium">Chưa có giao dịch nào</p>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Hãy thêm chi tiêu đầu tiên của bạn</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors duration-200">
-      <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50 transition-colors duration-200">
+    <div className="glass-card overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-blue-900/10">
+      <div className="px-6 py-5 border-b border-gray-100/50 dark:border-gray-800/50 flex justify-between items-center bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Lịch sử chi tiêu</h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">{transactions.length} giao dịch</span>
       </div>
