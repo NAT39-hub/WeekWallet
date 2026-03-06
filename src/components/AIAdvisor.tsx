@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, Loader2, MessageSquareText } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai'; // Dùng thư viện chuẩn
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Transaction, WeeklyStats } from '../types';
 import { formatVND } from '../utils';
 
@@ -23,16 +23,25 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
     setError(null);
 
     try {
-      // 1. Khởi tạo AI với Key bảo mật
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+      /**
+       * PHẦN NHẬP KEY API:
+       * 1. Cách chuẩn (Bảo mật): Sử dụng import.meta.env.VITE_GEMINI_API_KEY
+       * 2. Cách Test (Nếu cách 1 lỗi): Bạn xóa dòng dưới và dán trực tiếp: 
+       * const apiKey = "AIzaSyB_CUA_BAN_O_DAY";
+       */
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+      if (!apiKey) {
+        throw new Error("API Key bị trống (Undefined). Hãy kiểm tra lại cài đặt Vercel.");
+      }
+
+      const genAI = new GoogleGenerativeAI(apiKey);
       
-      // 2. Thiết lập Model và Vai trò chuyên gia (System Instruction)
       const model = genAI.getGenerativeModel({ 
         model: 'gemini-1.5-flash',
         systemInstruction: "Bạn là chuyên gia phân tích tài chính cá nhân. Dựa trên dữ liệu chi tiêu tuần này (gồm số tiền, ngày, hạng mục), hãy thực hiện: 1. Tóm tắt tổng chi tiêu. 2. Chỉ ra 1 hạng mục đang chi quá tay. 3. Đưa ra 3 lời khuyên ngắn gọn để tiết kiệm cho tuần sau. Trả lời bằng tiếng Việt, súc tích, chuyên nghiệp."
       });
 
-      // 3. Chuẩn bị dữ liệu gửi đi
       const prompt = `
         Thống kê chi tiêu tuần này:
         - Tổng chi: ${formatVND(stats.total)}
@@ -44,9 +53,9 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
       const response = await result.response;
       
       setAdvice(response.text() || 'Không thể lấy lời khuyên lúc này.');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Đã xảy ra lỗi khi kết nối với AI. Vui lòng kiểm tra lại API Key trong cài đặt GitHub/Vercel.');
+      setError(`Lỗi: ${err.message || 'Kết nối thất bại. Kiểm tra lại API Key.'}`);
     } finally {
       setLoading(false);
     }
