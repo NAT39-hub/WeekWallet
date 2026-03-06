@@ -38,7 +38,13 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
 
     try {
       let resultText = '';
-      const apiKey = "AIzaSyCM9xG-THrJgtvmtUVMmSsSvDJ6DCQJhLY";
+      
+      // Đã sửa: Tự động lấy API Key từ biến môi trường (Vercel hoặc .env)
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+      if (!apiKey) {
+        throw new Error("Không tìm thấy API Key. Vui lòng kiểm tra lại biến môi trường VITE_GEMINI_API_KEY trên Vercel.");
+      }
 
       const modelsToTry = [
         'gemini-1.5-pro',
