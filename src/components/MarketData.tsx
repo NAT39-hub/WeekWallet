@@ -9,7 +9,6 @@ export const MarketData: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // 2. Sử dụng useEffect để gọi API khi component được render lần đầu
-  // 2. Sử dụng useEffect để gọi API khi component được render lần đầu
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
