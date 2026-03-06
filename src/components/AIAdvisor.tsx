@@ -40,27 +40,11 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
       let resultText = '';
       const apiKey = "AIzaSyCM9xG-THrJgtvmtUVMmSsSvDJ6DCQJhLY";
 
-      // Lấy danh sách model động hỗ trợ generateContent thay vì dùng danh sách cố định
-      const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-      const listRes = await fetch(listUrl);
-      if (!listRes.ok) {
-        throw new Error("Không thể tải danh sách model từ API.");
-      }
-      const listData = await listRes.json();
-      const availableModels = listData.models
-        ?.filter((m: any) => m.supportedGenerationMethods?.includes("generateContent"))
-        ?.map((m: any) => m.name.replace('models/', '')) || [];
-
-      // Sắp xếp ưu tiên các model flash
-      const modelsToTry = availableModels.sort((a: string, b: string) => {
-        if (a.includes('flash') && !b.includes('flash')) return -1;
-        if (!a.includes('flash') && b.includes('flash')) return 1;
-        return 0;
-      });
-
-      if (modelsToTry.length === 0) {
-        throw new Error("Không tìm thấy model nào hỗ trợ chức năng này.");
-      }
+      const modelsToTry = [
+        'gemini-1.5-pro',
+        'gemini-1.5-flash',
+        'gemini-pro'
+      ];
 
       let lastError;
 
@@ -94,7 +78,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
       }
 
       if (!resultText) {
-        throw lastError || new Error("All models failed.");
+        throw lastError || new Error("Cả 3 model đều không phản hồi. API Key có thể đã bị giới hạn.");
       }
 
       setAdvice(resultText);
