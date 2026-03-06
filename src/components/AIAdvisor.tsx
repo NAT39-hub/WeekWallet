@@ -39,7 +39,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
       
       const model = genAI.getGenerativeModel({ 
         model: 'gemini-1.5-pro',
-        systemInstruction: ""Bạn là chuyên gia phân tích tài chính cá nhân. Dựa trên dữ liệu chi tiêu tuần này (gồm số tiền, ngày, hạng mục), hãy thực hiện: 1. Tóm tắt tổng chi tiêu. 2. Chỉ ra 1 hạng mục đang chi quá tay. 3. Đưa ra 3 lời khuyên ngắn gọn để tiết kiệm cho tuần sau. Trả lời bằng tiếng Việt, súc tích, chuyên nghiệp."
+        systemInstruction: "Bạn là chuyên gia phân tích tài chính cá nhân. Dựa trên dữ liệu chi tiêu tuần này (gồm số tiền, ngày, hạng mục), hãy thực hiện: 1. Tóm tắt tổng chi tiêu. 2. Chỉ ra 1 hạng mục đang chi quá tay. 3. Đưa ra 3 lời khuyên ngắn gọn để tiết kiệm cho tuần sau. Trả lời bằng tiếng Việt, súc tích, chuyên nghiệp."
       });
 
       const prompt = `
@@ -97,4 +97,5 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
     </div>
   );
 };
+
 
