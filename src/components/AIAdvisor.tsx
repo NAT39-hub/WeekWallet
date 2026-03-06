@@ -37,59 +37,24 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
     `;
 
     try {
-      let resultText = '';
-      
-      // Đã sửa: Tự động lấy API Key từ biến môi trường (Vercel hoặc .env)
+      // 1. Lấy API Key từ biến môi trường
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
       if (!apiKey) {
-        throw new Error("Không tìm thấy API Key. Vui lòng kiểm tra lại biến môi trường VITE_GEMINI_API_KEY trên Vercel.");
+        throw new Error("Không tìm thấy API Key. Vui lòng kiểm tra lại biến môi trường VITE_GEMINI_API_KEY.");
       }
 
-      const modelsToTry = [
-        'gemini-1.5-pro',
-        'gemini-1.5-flash',
-        'gemini-pro'
-      ];
+      // 2. Sử dụng thư viện chính chủ của Google cực kỳ gọn gàng
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      let lastError;
+      // 3. Gọi AI phân tích
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
 
-      for (const modelName of modelsToTry) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }]
-            })
-          });
-
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData?.error?.message || `HTTP error! status: ${res.status}`);
-          }
-
-          const data = await res.json();
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            resultText = data.candidates[0].content.parts[0].text;
-            break;
-          }
-        } catch (e: any) {
-          lastError = e;
-          console.warn(`Model ${modelName} failed:`, e.message);
-        }
-      }
-
-      if (!resultText) {
-        throw lastError || new Error("Cả 3 model đều không phản hồi. API Key có thể đã bị giới hạn.");
-      }
-
-      setAdvice(resultText);
+      setAdvice(responseText);
     } catch (err: any) {
-      console.error(err);
+      console.error("Lỗi từ Google AI:", err);
       setError("Lỗi: " + err.message);
     } finally {
       setLoading(false);
