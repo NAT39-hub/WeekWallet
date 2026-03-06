@@ -24,7 +24,7 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
 
     try {
       // KIỂM TRA KEY: Bạn có thể dán trực tiếp Key vào dấu "" nếu Vercel vẫn lỗi
-      const apiKey = AIzaSyCM9xG-THrJgtvmtUVMmSsSvDJ6DCQJhLY 
+      const apiKey = AIzaSyCM9xG-THrJgtvmtUVMmSsSvDJ6DCQJhLY ""
       
       if (!apiKey) {
         throw new Error("Không tìm thấy API Key. Hãy kiểm tra lại cấu hình Vercel.");
