@@ -14,7 +14,7 @@ const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'
 export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => {
   return (
     <div className="space-y-6 pb-10">
-      <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6 transition-all duration-300">
+      <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
         <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Tổng chi tiêu tuần này</h2>
         <div className="text-4xl font-light text-gray-900">{formatVND(stats.total)}</div>
       </div>
@@ -36,7 +36,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => 
 
         <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
           <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><PieIcon className="w-4 h-4 mr-2 text-emerald-500" /> Cơ cấu</h3>
-          <div className="h-64">
+          <div className="h-64 text-sm">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={stats.categoryBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="amount" nameKey="category">

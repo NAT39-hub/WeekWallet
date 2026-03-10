@@ -16,75 +16,51 @@ export const AIAdvisor: React.FC<AIAdvisorProps> = ({ transactions, stats }) => 
 
   const getAdvice = async () => {
     if (transactions.length === 0) {
-      setError('Cần có ít nhất 1 giao dịch để AI có thể phân tích.');
+      setError('Cần có ít nhất 1 giao dịch để phân tích.');
       return;
     }
     setLoading(true);
     setError(null);
 
-    const prompt = `
-      Bạn là một chuyên gia tư vấn tài chính cá nhân cho nhân viên văn phòng ở Việt Nam.
-      Dưới đây là thống kê chi tiêu của người dùng trong tuần này:
-      - Tổng chi tiêu: ${formatVND(stats.total)}
-      - Cơ cấu chi tiêu:
-      ${stats.categoryBreakdown.map((c: any) => `  + ${c.category}: ${formatVND(c.amount)}`).join('\n')}
-      
-      Chi tiết các giao dịch gần đây:
-      ${transactions.slice(0, 10).map((t: any) => `- ${t.date.split('T')[0]}: ${t.category} - ${formatVND(t.amount)} (${t.note})`).join('\n')}
-
-      Hãy phân tích ngắn gọn (khoảng 3-4 câu) và đưa ra 1-2 lời khuyên cụ thể, thực tế để tối ưu chi tiêu cho những ngày tiếp theo.
-      Giọng điệu thân thiện, động viên và chuyên nghiệp. Sử dụng tiếng Việt.
-    `;
+    const prompt = `Bạn là chuyên gia tài chính cho nhân viên văn phòng Việt Nam. Phân tích chi tiêu tuần này: Tổng ${formatVND(stats.total)}. Chi tiết: ${stats.categoryBreakdown.map(c => `${c.category}: ${formatVND(c.amount)}`).join(', ')}. Đưa ra 2 lời khuyên ngắn gọn.`;
 
     try {
-      // 1. Lấy API Key từ biến môi trường
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error("Chưa cấu hình API Key trên Vercel.");
 
-      if (!apiKey) {
-        throw new Error("Không tìm thấy API Key. Vui lòng kiểm tra lại biến môi trường VITE_GEMINI_API_KEY.");
-      }
-
-      // 2. Sử dụng thư viện chính chủ của Google cực kỳ gọn gàng
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      // Sử dụng gemini-2.0-flash để ổn định nhất năm 2026
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-      // 3. Gọi AI phân tích
       const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
-
-      setAdvice(responseText);
+      setAdvice(result.response.text());
     } catch (err: any) {
-      console.error("Lỗi từ Google AI:", err);
-      setError("Lỗi: " + err.message);
+      setError("Lỗi AI: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-xl dark:shadow-2xl rounded-2xl bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 p-6 transition-all duration-300 hover:shadow-lg dark:hover:shadow-indigo-900/20">
+    <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl transition-colors duration-200">
-            <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-          </div>
+          <Sparkles className="w-6 h-6 text-indigo-600" />
           <div>
-            <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100">AI Tối ưu chi tiêu</h3>
-            <p className="text-sm text-indigo-700/80 dark:text-indigo-300/80">Nhận lời khuyên tài chính mỗi tối</p>
+            <h3 className="text-lg font-semibold text-indigo-900">AI Tư vấn chi tiêu</h3>
+            <p className="text-sm text-gray-500">Tech Chef Tú Advisor</p>
           </div>
         </div>
-        <button onClick={getAdvice} disabled={loading} className="flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">
-          {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Đang phân tích...</> : <><MessageSquareText className="w-4 h-4 mr-2" />Phân tích ngay</>}
+        <button onClick={getAdvice} disabled={loading} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquareText className="w-4 h-4" />}
         </button>
       </div>
-      {error && <div className="mt-4 p-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm border border-red-100 dark:border-red-500/20 transition-colors duration-200">{error}</div>}
+      {error && <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-xs">{error}</div>}
       {advice && !loading && (
-        <div className="mt-6 p-5 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-xl relative overflow-hidden transition-all duration-300 animate-fade-in-up">
-          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-blue-400"></div>
-          <p className="text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-line text-sm">{advice}</p>
+        <div className="mt-6 p-4 bg-indigo-50/50 border-l-4 border-indigo-500 rounded-r-xl">
+          <p className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">{advice}</p>
         </div>
       )}
     </div>
   );
 };
-

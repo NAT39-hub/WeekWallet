@@ -31,7 +31,7 @@ export default function App() {
   };
 
   const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Anh Tú có chắc muốn xóa không?')) {
+    if (window.confirm('Anh Tú muốn xóa giao dịch này chứ?')) {
       setTransactions((prev) => prev.filter((t) => t.id !== id));
     }
   };
@@ -39,13 +39,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="bg-white border-b border-gray-200 hidden sm:block"><div className="max-w-7xl mx-auto px-8 py-2"><MarketData /></div></div>
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-8 flex justify-between h-16 items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-blue-600 p-2.5 rounded-xl"><Wallet className="w-6 h-6 text-white" /></div>
+            <div className="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20"><Wallet className="w-6 h-6 text-white" /></div>
             <div>
-              <h1 className="text-xl font-bold">WeekWallet</h1>
-              <p className="text-[10px] text-gray-400 uppercase">By Tech Chef Tú</p>
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">WeekWallet</h1>
+              <p className="text-[10px] text-gray-400 uppercase tracking-tighter">By Tech Chef Tú</p>
             </div>
           </div>
           <div className="sm:hidden"><MarketData /></div>
