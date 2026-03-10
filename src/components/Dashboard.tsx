@@ -2,7 +2,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 import { WeeklyStats, Transaction } from '../types';
 import { formatVND, exportToExcel } from '../utils';
-import { Download, ChartPie, TrendingUp } from 'lucide-react'; // Đã dùng ChartPie để tránh trùng tên
+import { Download, ChartPie, TrendingUp } from 'lucide-react'; // Đã đổi tên icon ở đây
 
 interface DashboardProps {
   stats: WeeklyStats;
@@ -14,14 +14,16 @@ const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'
 export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => {
   return (
     <div className="space-y-6 pb-10">
-      <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
+      <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6 transition-all duration-300">
         <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Tổng chi tiêu tuần này</h2>
         <div className="text-4xl font-light text-gray-900">{formatVND(stats.total)}</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
-          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><TrendingUp className="w-4 h-4 mr-2 text-blue-500" /> Theo ngày</h3>
+          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center">
+            <TrendingUp className="w-4 h-4 mr-2 text-blue-500" /> Theo ngày
+          </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.dailyBreakdown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -35,8 +37,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => 
         </div>
 
         <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
-          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><ChartPie className="w-4 h-4 mr-2 text-emerald-500" /> Cơ cấu</h3>
-          <div className="h-64 text-sm">
+          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center">
+            <ChartPie className="w-4 h-4 mr-2 text-emerald-500" /> Cơ cấu chi tiêu
+          </h3>
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={stats.categoryBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="amount" nameKey="category">

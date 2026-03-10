@@ -1,5 +1,6 @@
 import { Transaction, WeeklyStats, Category } from './types';
 
+// 1. Định dạng tiền VND
 export const formatVND = (amount: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -7,6 +8,16 @@ export const formatVND = (amount: number) => {
   }).format(amount);
 };
 
+// 2. Định dạng ngày tháng (Cần thiết cho TransactionList)
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+// 3. Logic tính toán thống kê tuần
 export const getWeeklyStats = (transactions: Transaction[]): WeeklyStats => {
   const total = transactions.reduce((sum, t) => sum + t.amount, 0);
   const categoryMap = transactions.reduce((acc, t) => {
@@ -31,10 +42,16 @@ export const getWeeklyStats = (transactions: Transaction[]): WeeklyStats => {
   return { weekStart: '', weekEnd: '', total, dailyBreakdown, categoryBreakdown };
 };
 
+// 4. Logic Xuất file Excel (CSV)
 export const exportToExcel = (transactions: Transaction[], total: number) => {
   const headers = ['Ngày', 'Danh mục', 'Số tiền (VND)', 'Ghi chú'];
-  const rows = transactions.map(t => [t.date.split('T')[0], t.category, t.amount.toString(), t.note || '']);
-  const csvContent = "\uFEFF" + [headers, ...rows, ['', 'TỔNG CỘNG', total.toString(), ''], ['', 'NGÀY XUẤT', new Date().toLocaleString('vi-VN'), ''], ['', 'BÁO CÁO TỪ', 'TECH CHEF TÚ', '']]
+  const rows = transactions.map(t => [
+    t.date.split('T')[0],
+    t.category,
+    t.amount.toString(),
+    t.note || ''
+  ]);
+  const csvContent = "\uFEFF" + [headers, ...rows, ['', 'TỔNG CỘNG', total.toString(), ''], ['', 'BÁO CÁO TỪ', 'TECH CHEF TÚ', '']]
     .map(e => e.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
