@@ -1,20 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+/* Cú pháp chuẩn của Tailwind v4 */
+@import "tailwindcss";
 
-:root {
-  font-family: 'Outfit', sans-serif;
+/* Thiết lập font chữ theo v4 */
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Đặt màu nền cơ bản bằng CSS thuần, tuyệt đối không dùng @apply để tránh lỗi */
 body {
-  /* Đã gỡ bỏ @apply gây lỗi, dùng CSS thuần cho an toàn */
   background-color: #f8fafc;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ------------------------------------- */
+/* HIỆU ỨNG VIP CỦA TECH CHEF TÚ         */
+/* ------------------------------------- */
 
 /* Hiệu ứng tia chớp cho nút Vàng Gold */
 @keyframes shine {
@@ -49,7 +52,7 @@ body {
   background: white;
 }
 
-/* Ẩn thanh cuộn cho ticker mobile */
+/* Ẩn thanh cuộn cho ticker mobile nhưng vẫn vuốt được */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -58,7 +61,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Hiệu ứng hiện hình */
+/* Hiệu ứng hiện hình mượt mà */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
