@@ -24,14 +24,14 @@ export default function App() {
 
   const handleAddTransaction = (amount: number, category: Category, note: string, date: string) => {
     const newTransaction: Transaction = {
-      id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Date.now().toString(),
+      id: Date.now().toString(),
       amount, category, note, date,
     };
     setTransactions((prev) => [newTransaction, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   };
 
   const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Anh Tú muốn xóa giao dịch này chứ?')) {
+    if (window.confirm('Anh Tú có chắc muốn xóa không?')) {
       setTransactions((prev) => prev.filter((t) => t.id !== id));
     }
   };
@@ -39,13 +39,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="bg-white border-b border-gray-200 hidden sm:block"><div className="max-w-7xl mx-auto px-8 py-2"><MarketData /></div></div>
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-8 flex justify-between h-16 items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20"><Wallet className="w-6 h-6 text-white" /></div>
+            <div className="bg-blue-600 p-2.5 rounded-xl"><Wallet className="w-6 h-6 text-white" /></div>
             <div>
-              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">WeekWallet</h1>
-              <p className="text-[10px] text-gray-400 uppercase tracking-tighter">By Tech Chef Tú</p>
+              <h1 className="text-xl font-bold">WeekWallet</h1>
+              <p className="text-[10px] text-gray-400 uppercase">By Tech Chef Tú</p>
             </div>
           </div>
           <div className="sm:hidden"><MarketData /></div>
@@ -53,8 +53,14 @@ export default function App() {
       </header>
       <main className="max-w-7xl mx-auto px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-8"><TransactionForm onAdd={handleAddTransaction} /><AIAdvisor transactions={transactions} stats={stats} /></div>
-          <div className="lg:col-span-2 space-y-8"><Dashboard stats={stats} transactions={transactions} /><TransactionList transactions={transactions} onDelete={handleDeleteTransaction} /></div>
+          <div className="lg:col-span-1 space-y-8">
+            <TransactionForm onAdd={handleAddTransaction} />
+            <AIAdvisor transactions={transactions} stats={stats} />
+          </div>
+          <div className="lg:col-span-2 space-y-8">
+            <Dashboard stats={stats} transactions={transactions} />
+            <TransactionList transactions={transactions} onDelete={handleDeleteTransaction} />
+          </div>
         </div>
       </main>
     </div>
