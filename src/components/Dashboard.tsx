@@ -21,7 +21,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
-          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><TrendingUp className="w-4 h-4 mr-2 text-blue-500" /> Theo ngày</h3>
+          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><TrendingUp className="w-4 h-4 mr-2 text-blue-500" /> Chi tiêu theo ngày</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.dailyBreakdown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -35,7 +35,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ stats, transactions }) => 
         </div>
 
         <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
-          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><PieIcon className="w-4 h-4 mr-2 text-emerald-500" /> Cơ cấu</h3>
+          <h3 className="text-base font-medium text-gray-800 mb-4 flex items-center"><PieIcon className="w-4 h-4 mr-2 text-emerald-500" /> Cơ cấu chi tiêu</h3>
           <div className="h-64 text-sm">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
