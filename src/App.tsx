@@ -31,59 +31,57 @@ export default function App() {
   };
 
   const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Anh Tú chắc chắn muốn xóa giao dịch này chứ?')) {
+    if (window.confirm('Anh Tú chắc chắn muốn xóa không?')) {
       setTransactions((prev) => prev.filter((t) => t.id !== id));
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-indigo-100 relative overflow-x-hidden">
-      {/* Hiệu ứng nền Blur nghệ thuật */}
-      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/30 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-200/30 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-indigo-100 relative">
+      {/* TỶ GIÁ: Đã mở khóa cho Mobile - Vuốt ngang để xem */}
+      <div className="bg-white border-b border-slate-200 overflow-x-auto no-scrollbar sticky top-0 z-[60]">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center min-w-max">
+          <MarketData />
+        </div>
+      </div>
 
-      <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/60 sticky top-[41px] z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-3 rounded-2xl shadow-lg shadow-indigo-200">
               <Wallet className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600">
+              <h1 className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-600">
                 WeekWallet
               </h1>
               <div className="flex items-center text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
-                <ShieldCheck className="w-3 h-3 mr-1" /> Premium Advisor
+                <ShieldCheck className="w-3 h-3 mr-1" /> PREMIUM ADVISOR
               </div>
             </div>
-          </div>
-          <div className="hidden md:block">
-             <MarketData />
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-10 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Cột trái: Nhập liệu & AI (Chiếm 4 phần) */}
-          <div className="lg:col-span-4 space-y-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4 space-y-8">
             <TransactionForm onAdd={handleAddTransaction} />
             <AIAdvisor transactions={transactions} stats={stats} />
           </div>
 
-          {/* Cột phải: Thống kê & Danh sách (Chiếm 8 phần) */}
-          <div className="lg:col-span-8 space-y-10">
+          <div className="lg:col-span-8 space-y-8">
             <Dashboard stats={stats} transactions={transactions} />
-            <div className="bg-white/50 backdrop-blur-md rounded-3xl border border-white/40 p-1">
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
                <TransactionList transactions={transactions} onDelete={handleDeleteTransaction} />
             </div>
           </div>
         </div>
       </main>
 
-      <footer className="py-12 text-center border-t border-slate-200/60 bg-white/30 backdrop-blur-md">
-        <p className="text-xs text-slate-400 font-medium uppercase tracking-[0.3em]">
-          Masterpiece by <span className="text-slate-800 font-bold">Tech Chef Tú</span> © 2026
+      <footer className="py-10 text-center border-t border-slate-200 bg-white/50 backdrop-blur-md">
+        <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em]">
+          Masterpiece by <span className="text-slate-800">Tech Chef Tú</span> © 2026
         </p>
       </footer>
     </div>
