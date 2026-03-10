@@ -30,22 +30,20 @@ export default function App() {
     setTransactions((prev) => [newTransaction, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   };
 
-  const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Anh Tú chắc chắn muốn xóa không?')) {
-      setTransactions((prev) => prev.filter((t) => t.id !== id));
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-indigo-100 relative">
-      {/* TỶ GIÁ: Đã mở khóa cho Mobile - Vuốt ngang để xem */}
-      <div className="bg-white border-b border-slate-200 overflow-x-auto no-scrollbar sticky top-0 z-[60]">
+      {/* Tỷ giá Ticker - Thiết kế VIP đặc biệt của Tech Chef Tú */}
+      <div className="vip-ticker-bar border-b border-amber-100/50 overflow-x-auto no-scrollbar sticky top-0 z-[60]">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center min-w-max">
+          <div className="flex items-center space-x-2 mr-4 pr-4 border-r border-amber-200">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-black text-amber-600 uppercase tracking-tighter">Live Market</span>
+          </div>
           <MarketData />
         </div>
       </div>
 
-      <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/60 sticky top-[41px] z-50 shadow-sm">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-[41px] z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-3 rounded-2xl shadow-lg shadow-indigo-200">
@@ -73,7 +71,7 @@ export default function App() {
           <div className="lg:col-span-8 space-y-8">
             <Dashboard stats={stats} transactions={transactions} />
             <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-               <TransactionList transactions={transactions} onDelete={handleDeleteTransaction} />
+               <TransactionList transactions={transactions} onDelete={(id) => setTransactions(prev => prev.filter(t => t.id !== id))} />
             </div>
           </div>
         </div>
