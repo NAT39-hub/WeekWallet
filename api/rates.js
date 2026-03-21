@@ -3,49 +3,47 @@ export default async function handler(req, res) {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
   };
 
-  let gold = '0'; 
-  let silver = '0'; 
-  let usd = '0';
+  // Mặc định là Lỗi, quét thành công mới đổi số
+  let gold = 'Lỗi'; 
+  let silver = 'Lỗi'; 
+  let usd = 'Lỗi';
 
   try {
-    // 1. BẠC DOJI (Lấy chính xác cột Bán Ra)
+    // 1. DOJI
     try {
       const dojiRes = await fetch('https://giabac.doji.vn', { headers });
-      const dojiHtml = await dojiRes.text();
-      // Quét gom tất cả các số đầu 2,3,4
-      const dojiMatches = dojiHtml.match(/[234][.,]\d{3}/g);
-      if (dojiMatches && dojiMatches.length >= 2) {
-        silver = dojiMatches[1].replace(',', '.'); // [1] là lấy con số thứ 2 (Bán Ra)
-      } else if (dojiMatches) {
-        silver = dojiMatches[0].replace(',', '.');
+      if (dojiRes.ok) {
+        const dojiHtml = await dojiRes.text();
+        const dojiMatches = dojiHtml.match(/[2345][.,]\d{3}/g);
+        if (dojiMatches && dojiMatches.length >= 2) {
+          silver = dojiMatches[1].replace(',', '.'); 
+        }
       }
-    } catch (e) { console.error("DOJI Error"); }
+    } catch (e) { console.error("DOJI Fetch Error"); }
 
-    // 2. VÀNG SJC (Khóa mục tiêu chuẩn xác hơn)
+    // 2. SJC (webgia)
     try {
       const sjcRes = await fetch('https://webgia.com/gia-vang/sjc/', { headers });
-      const sjcHtml = await sjcRes.text();
-      // Gom tất cả số từ 80.xxx đến 199.xxx, phớt lờ mấy số rác 70k
-      const sjcMatches = sjcHtml.match(/1[6789]\d[.,]\d{3}|[89]\d[.,]\d{3}/g);
-      if (sjcMatches && sjcMatches.length >= 2) {
-        gold = sjcMatches[1].replace(',', '.'); // Lấy số thứ 2 (Bán Ra)
-      } else if (sjcMatches) {
-        gold = sjcMatches[0].replace(',', '.');
+      if (sjcRes.ok) {
+        const sjcHtml = await sjcRes.text();
+        const sjcMatches = sjcHtml.match(/1?[789]\d[.,]\d{3}|[89]\d[.,]\d{3}/g);
+        if (sjcMatches && sjcMatches.length >= 2) {
+          gold = sjcMatches[1].replace(',', '.');
+        }
       }
-    } catch (e) { console.error("SJC Error"); }
+    } catch (e) { console.error("SJC Fetch Error"); }
 
-    // 3. USD CHỢ ĐEN (Bắt rộng hơn để không trượt)
+    // 3. USD (webgia)
     try {
       const usdRes = await fetch('https://webgia.com/ty-gia/usd-cho-den/', { headers });
-      const usdHtml = await usdRes.text();
-      // Bắt các định dạng: 25.123, 26,123, hoặc 27.xxx
-      const usdMatches = usdHtml.match(/2[567][.,]\d{3}/g);
-      if (usdMatches && usdMatches.length >= 2) {
-        usd = usdMatches[1].replace(',', '.'); // Lấy số thứ 2 (Bán Ra)
-      } else if (usdMatches) {
-        usd = usdMatches[0].replace(',', '.');
+      if (usdRes.ok) {
+        const usdHtml = await usdRes.text();
+        const usdMatches = usdHtml.match(/2[567][.,]\d{3}/g);
+        if (usdMatches && usdMatches.length >= 2) {
+          usd = usdMatches[1].replace(',', '.');
+        }
       }
-    } catch (e) { console.error("USD Error"); }
+    } catch (e) { console.error("USD Fetch Error"); }
 
   } catch (error) {
     console.error("Lỗi API tổng");
