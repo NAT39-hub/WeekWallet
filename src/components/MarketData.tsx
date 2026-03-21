@@ -1,67 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Coins, DollarSign } from 'lucide-react';
+import { TrendingUp, Coins, DollarSign, RefreshCw } from 'lucide-react';
 
 export const MarketData: React.FC = () => {
-  // 1. Giá trị mặc định (Back-up an toàn, đảm bảo app không bao giờ trống)
+  // Giá trị gốc dự phòng để không bao giờ bị trống
   const [rates, setRates] = useState({
     gold: '186.100',
     silver: '3.466',
     usd: '27.200'
   });
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchRealTimeRates = async () => {
+    setIsFetching(true);
+    try {
+      // Hàm bọc Proxy chống Cache cực mạnh
+      const getRawText = async (url: string) => {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&disableCache=true&t=${Date.now()}`;
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        
+        // Lột sạch HTML, chỉ lấy Text thô để quét số không bị vướng
+        const doc = new DOMParser().parseFromString(data.contents || "", 'text/html');
+        return doc.body.textContent || "";
+      };
+
+      // 1. Quét VÀNG SJC (Tìm số dạng 7x.xxx, 8x.xxx, 9x.xxx)
+      try {
+        const sjcText = await getRawText('https://sjc.com.vn/gia-vang-online');
+        const matchGold = sjcText.match(/[789]\d[.,]\d{3}/);
+        if (matchGold) setRates(prev => ({ ...prev, gold: matchGold[0].replace(',', '.') }));
+      } catch (e) { console.log("Lỗi Vàng"); }
+
+      // 2. Quét BẠC DOJI (Tìm số dạng 3.xxx, 4.xxx)
+      try {
+        const dojiText = await getRawText('https://giabac.doji.vn');
+        const matchSilver = dojiText.match(/[345][.,]\d{3}/);
+        if (matchSilver) setRates(prev => ({ ...prev, silver: matchSilver[0].replace(',', '.') }));
+      } catch (e) { console.log("Lỗi Bạc"); }
+
+      // 3. Quét USD (Tìm số dạng 25.xxx, 26.xxx, 27.xxx)
+      try {
+        const usdText = await getRawText('https://tygiausd.org');
+        const matchUsd = usdText.match(/2[5678][.,]\d{3}/);
+        if (matchUsd) setRates(prev => ({ ...prev, usd: matchUsd[0].replace(',', '.') }));
+      } catch (e) { console.log("Lỗi USD"); }
+
+    } catch (error) {
+      console.log("Lỗi tổng", error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchRealTimeRates = async () => {
-      // --- 1. LẤY GIÁ VÀNG SJC ---
-      try {
-        const sjcUrl = 'https://sjc.com.vn/gia-vang-online';
-        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(sjcUrl)}`);
-        const data = await res.json();
-        
-        // Dò tìm giá bán (thường là cụm số thứ 2 sau khi có chữ SJC)
-        // Lấy định dạng số có 2-3 chữ số, dấu chấm/phẩy, rồi 3 chữ số (VD: 82.500 hoặc 186.100)
-        const matches = data.contents.match(/\d{2,3}[.,]\d{3}/g);
-        if (matches && matches.length >= 2) {
-          // Lấy giá trị thứ 2 (thường là giá Bán ra)
-          setRates(prev => ({ ...prev, gold: matches[1].replace(',', '.') }));
-        }
-      } catch (e) { console.log("Lỗi quét Vàng SJC, giữ nguyên giá cũ."); }
-
-      // --- 2. LẤY GIÁ BẠC DOJI ---
-      try {
-        const dojiUrl = 'https://giabac.doji.vn';
-        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(dojiUrl)}`);
-        const data = await res.json();
-        
-        // Dò tìm giá bạc (VD: 3.466)
-        const matches = data.contents.match(/\d{1,2}[.,]\d{3}/g);
-        if (matches && matches.length > 0) {
-          setRates(prev => ({ ...prev, silver: matches[0].replace(',', '.') }));
-        }
-      } catch (e) { console.log("Lỗi quét Bạc DOJI, giữ nguyên giá cũ."); }
-
-      // --- 3. LẤY GIÁ USD TỶ GIÁ USD ---
-      try {
-        const usdUrl = 'https://tygiausd.org';
-        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(usdUrl)}`);
-        const data = await res.json();
-        
-        // Dò tìm giá USD bán ra (Thường đầu số 25, 26, 27... VD: 27.200)
-        const matches = data.contents.match(/2[5-9][.,]\d{3}/g);
-        if (matches && matches.length > 0) {
-          setRates(prev => ({ ...prev, usd: matches[0].replace(',', '.') }));
-        }
-      } catch (e) { console.log("Lỗi quét USD, giữ nguyên giá cũ."); }
-    };
-
-    // Chạy lần đầu ngay khi mở web
     fetchRealTimeRates();
-    
-    // Đặt lịch tự động quét lại sau mỗi 5 phút (300000ms) để không bị các web kia chặn IP
+    // Tự động quét 5 phút / lần
     const interval = setInterval(fetchRealTimeRates, 300000);
     return () => clearInterval(interval);
   }, []);
 
-  // Khung giao diện chuẩn VIP
   const marketRates = [
     { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: <TrendingUp className="w-3 h-3 text-amber-500" /> },
     { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: <Coins className="w-3 h-3 text-slate-400" /> },
@@ -69,9 +66,9 @@ export const MarketData: React.FC = () => {
   ];
 
   return (
-    <div className="flex items-center space-x-8">
+    <div className="flex items-center space-x-6 relative">
       {marketRates.map((rate, index) => (
-        <div key={index} className="flex items-center space-x-2 whitespace-nowrap animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+        <div key={index} className="flex items-center space-x-2 whitespace-nowrap animate-fade-in-up">
           <div className="p-1.5 bg-slate-50 rounded-lg">{rate.icon}</div>
           <div className="flex flex-col">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{rate.label}</span>
@@ -82,6 +79,16 @@ export const MarketData: React.FC = () => {
           </div>
         </div>
       ))}
+      
+      {/* Nút Refresh thủ công để anh Tú tự bấm Test */}
+      <button 
+        onClick={fetchRealTimeRates} 
+        disabled={isFetching} 
+        className="ml-4 p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition-all shadow-sm active:scale-90"
+        title="Tải lại giá ngay"
+      >
+        <RefreshCw className={`w-3 h-3 text-slate-400 ${isFetching ? 'animate-spin text-indigo-500' : ''}`} />
+      </button>
     </div>
   );
 };
