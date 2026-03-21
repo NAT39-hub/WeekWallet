@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, Coins, DollarSign, RefreshCw } from 'lucide-react';
 
 export const MarketData: React.FC = () => {
-  // Giá trị gốc dự phòng để không bao giờ bị trống
   const [rates, setRates] = useState({
-    gold: '186.100',
-    silver: '3.466',
+    gold: '171.000', // Giá khởi tạo tắp lự
+    silver: '3.090',
     usd: '27.200'
   });
   const [isFetching, setIsFetching] = useState(false);
@@ -13,40 +12,18 @@ export const MarketData: React.FC = () => {
   const fetchRealTimeRates = async () => {
     setIsFetching(true);
     try {
-      // Hàm bọc Proxy chống Cache cực mạnh
-      const getRawText = async (url: string) => {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&disableCache=true&t=${Date.now()}`;
-        const res = await fetch(proxyUrl);
-        const data = await res.json();
-        
-        // Lột sạch HTML, chỉ lấy Text thô để quét số không bị vướng
-        const doc = new DOMParser().parseFromString(data.contents || "", 'text/html');
-        return doc.body.textContent || "";
-      };
-
-      // 1. Quét VÀNG SJC (Tìm số dạng 7x.xxx, 8x.xxx, 9x.xxx)
-      try {
-        const sjcText = await getRawText('https://sjc.com.vn/gia-vang-online');
-        const matchGold = sjcText.match(/[789]\d[.,]\d{3}/);
-        if (matchGold) setRates(prev => ({ ...prev, gold: matchGold[0].replace(',', '.') }));
-      } catch (e) { console.log("Lỗi Vàng"); }
-
-      // 2. Quét BẠC DOJI (Tìm số dạng 3.xxx, 4.xxx)
-      try {
-        const dojiText = await getRawText('https://giabac.doji.vn');
-        const matchSilver = dojiText.match(/[345][.,]\d{3}/);
-        if (matchSilver) setRates(prev => ({ ...prev, silver: matchSilver[0].replace(',', '.') }));
-      } catch (e) { console.log("Lỗi Bạc"); }
-
-      // 3. Quét USD (Tìm số dạng 25.xxx, 26.xxx, 27.xxx)
-      try {
-        const usdText = await getRawText('https://tygiausd.org');
-        const matchUsd = usdText.match(/2[5678][.,]\d{3}/);
-        if (matchUsd) setRates(prev => ({ ...prev, usd: matchUsd[0].replace(',', '.') }));
-      } catch (e) { console.log("Lỗi USD"); }
-
+      // Gọi trực tiếp đến API Backend nhà làm (bỏ qua mọi rào cản proxy bên ngoài)
+      const res = await fetch('/api/rates');
+      if (!res.ok) throw new Error('API Error');
+      
+      const data = await res.json();
+      setRates({
+        gold: data.gold,
+        silver: data.silver,
+        usd: data.usd
+      });
     } catch (error) {
-      console.log("Lỗi tổng", error);
+      console.log("Dùng số dự phòng vì Backend bận.");
     } finally {
       setIsFetching(false);
     }
@@ -54,8 +31,8 @@ export const MarketData: React.FC = () => {
 
   useEffect(() => {
     fetchRealTimeRates();
-    // Tự động quét 5 phút / lần
-    const interval = setInterval(fetchRealTimeRates, 300000);
+    // Tự động quét 3 phút / lần
+    const interval = setInterval(fetchRealTimeRates, 180000);
     return () => clearInterval(interval);
   }, []);
 
@@ -80,12 +57,11 @@ export const MarketData: React.FC = () => {
         </div>
       ))}
       
-      {/* Nút Refresh thủ công để anh Tú tự bấm Test */}
+      {/* Nút bấm tải lại thần thánh */}
       <button 
         onClick={fetchRealTimeRates} 
         disabled={isFetching} 
         className="ml-4 p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition-all shadow-sm active:scale-90"
-        title="Tải lại giá ngay"
       >
         <RefreshCw className={`w-3 h-3 text-slate-400 ${isFetching ? 'animate-spin text-indigo-500' : ''}`} />
       </button>
