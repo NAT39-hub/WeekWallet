@@ -1,29 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Coins, DollarSign, RefreshCw } from 'lucide-react';
+import { TrendingUp, Coins, DollarSign, RefreshCw, AlertCircle } from 'lucide-react';
 
 export const MarketData: React.FC = () => {
+  // Trạng thái ban đầu là "..."
   const [rates, setRates] = useState({
-    gold: '171.000', // Giá khởi tạo tắp lự
-    silver: '3.090',
-    usd: '27.200'
+    gold: '...',
+    silver: '...',
+    usd: '...'
   });
   const [isFetching, setIsFetching] = useState(false);
 
   const fetchRealTimeRates = async () => {
     setIsFetching(true);
+    // Bấm nút là đưa về "..." để biết máy đang làm việc
+    setRates({ gold: '...', silver: '...', usd: '...' }); 
+    
     try {
-      // Gọi trực tiếp đến API Backend nhà làm (bỏ qua mọi rào cản proxy bên ngoài)
       const res = await fetch('/api/rates');
-      if (!res.ok) throw new Error('API Error');
+      if (!res.ok) throw new Error('API sập');
       
       const data = await res.json();
       setRates({
-        gold: data.gold,
-        silver: data.silver,
-        usd: data.usd
+        gold: data.gold || 'Lỗi',
+        silver: data.silver || 'Lỗi',
+        usd: data.usd || 'Lỗi'
       });
     } catch (error) {
-      console.log("Dùng số dự phòng vì Backend bận.");
+      setRates({ gold: 'Lỗi', silver: 'Lỗi', usd: 'Lỗi' });
     } finally {
       setIsFetching(false);
     }
@@ -31,15 +34,14 @@ export const MarketData: React.FC = () => {
 
   useEffect(() => {
     fetchRealTimeRates();
-    // Tự động quét 3 phút / lần
     const interval = setInterval(fetchRealTimeRates, 180000);
     return () => clearInterval(interval);
   }, []);
 
   const marketRates = [
-    { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: <TrendingUp className="w-3 h-3 text-amber-500" /> },
-    { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: <Coins className="w-3 h-3 text-slate-400" /> },
-    { label: 'USD BÁN RA', value: rates.usd, unit: 'đ', icon: <DollarSign className="w-3 h-3 text-emerald-500" /> }
+    { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: rates.gold === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <TrendingUp className="w-3 h-3 text-amber-500" /> },
+    { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: rates.silver === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <Coins className="w-3 h-3 text-slate-400" /> },
+    { label: 'USD BÁN RA', value: rates.usd, unit: 'đ', icon: rates.usd === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <DollarSign className="w-3 h-3 text-emerald-500" /> }
   ];
 
   return (
@@ -50,14 +52,18 @@ export const MarketData: React.FC = () => {
           <div className="flex flex-col">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{rate.label}</span>
             <div className="flex items-baseline space-x-1">
-              <span className="text-xs font-black text-slate-800 tracking-tight">{rate.value}</span>
-              <span className="text-[10px] font-bold text-slate-400 underline decoration-slate-200">{rate.unit}</span>
+              {/* Nếu dính Lỗi thì đổi màu chữ sang đỏ cho dễ nhìn */}
+              <span className={`text-xs font-black tracking-tight ${rate.value === 'Lỗi' ? 'text-rose-600' : rate.value === '...' ? 'text-slate-400 animate-pulse' : 'text-slate-800'}`}>
+                {rate.value}
+              </span>
+              {rate.value !== 'Lỗi' && rate.value !== '...' && (
+                <span className="text-[10px] font-bold text-slate-400 underline decoration-slate-200">{rate.unit}</span>
+              )}
             </div>
           </div>
         </div>
       ))}
       
-      {/* Nút bấm tải lại thần thánh */}
       <button 
         onClick={fetchRealTimeRates} 
         disabled={isFetching} 
