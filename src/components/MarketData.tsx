@@ -2,47 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, Coins, DollarSign } from 'lucide-react';
 
 export const MarketData: React.FC = () => {
-  // 1. Quản lý trạng thái cho từng loại tỷ giá riêng biệt
-  const [goldRate, setGoldRate] = useState('186.100');
-  const [silverRate, setSilverRate] = useState('3.466');
-  const [usdRate, setUsdRate] = useState('Đang tải...');
+  // 1. Khởi tạo bằng số cứng y hệt code cũ của anh để giao diện HIỆN NGAY LẬP TỨC
+  const [rates, setRates] = useState({
+    gold: '186.100',
+    silver: '3.466',
+    usd: '27.150 - 27.200'
+  });
 
-  // 2. Lắp "động cơ" tự động lấy dữ liệu (Chạy ngầm, không làm đơ web)
+  // 2. Chạy ngầm việc lấy giá USD (Lỗi thì bỏ qua, không làm sập web)
   useEffect(() => {
-    const fetchUsdBlackMarket = async () => {
+    const fetchUsd = async () => {
       try {
         const targetUrl = 'https://webgia.com/ty-gia/usd-cho-den/'; 
-        // Dùng trạm trung chuyển (Proxy) để vượt rào bảo mật web
         const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
         if (!res.ok) return;
         
         const data = await res.json();
-        const htmlText = data.contents;
-        const match = htmlText.match(/(\d{2}\.\d{3})\s*-\s*(\d{2}\.\d{3})/);
+        const html = data.contents;
         
-        if (match) {
-          setUsdRate(`${match[1]} - ${match[2]}`);
+        // Quét tìm tất cả các số định dạng 27.xxx hoặc 27,xxx (Bắt mọi trường hợp)
+        const matches = html.match(/2[5678][.,]\d{3}/g);
+        if (matches && matches.length >= 2) {
+           const buy = matches[0].replace(',', '.');
+           const sell = matches[1].replace(',', '.');
+           // Cập nhật nếu tìm thấy giá trị hợp lý
+           if (buy !== sell) {
+              setRates(prev => ({ ...prev, usd: `${buy} - ${sell}` }));
+           }
         }
-      } catch (error) {
-        console.error("Lỗi mạng khi lấy USD:", error);
-        // Lỗi thì lấy giá hờ, không làm sập giao diện
-        setUsdRate('27.150 - 27.200'); 
+      } catch (e) {
+        // Lỗi mạng hoặc web chặn -> Im lặng dùng số mặc định, không báo lỗi
+        console.log("Dùng tỷ giá mặc định.");
       }
     };
 
-    // (Anh có thể viết thêm hàm fetchGold() tương tự ở đây nếu có API cho Vàng)
-    
-    fetchUsdBlackMarket();
-    // Tự động làm mới USD mỗi 3 phút (180000ms)
-    const interval = setInterval(fetchUsdBlackMarket, 180000);
+    fetchUsd();
+    // 3 phút quét lại 1 lần
+    const interval = setInterval(fetchUsd, 180000);
     return () => clearInterval(interval);
   }, []);
 
-  // 3. Khung hiển thị y hệt code cũ của anh Tú (Render bằng map rất gọn)
+  // 3. Khung hiển thị chuẩn VIP
   const marketRates = [
-    { label: 'VÀNG SJC', value: goldRate, unit: 'K/Lượng', icon: <TrendingUp className="w-3 h-3 text-amber-500" /> },
-    { label: 'BẠC DOJI', value: silverRate, unit: 'K/Lượng', icon: <Coins className="w-3 h-3 text-slate-400" /> },
-    { label: 'USD CHỢ ĐEN', value: usdRate, unit: 'đ', icon: <DollarSign className="w-3 h-3 text-emerald-500" /> }
+    { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: <TrendingUp className="w-3 h-3 text-amber-500" /> },
+    { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: <Coins className="w-3 h-3 text-slate-400" /> },
+    { label: 'USD CHỢ ĐEN', value: rates.usd, unit: 'đ', icon: <DollarSign className="w-3 h-3 text-emerald-500" /> }
   ];
 
   return (
