@@ -3,55 +3,49 @@ export default async function handler(req, res) {
   let silver = 'Lỗi'; 
   let usd = 'Lỗi';
 
-  // Vũ khí tối thượng: Hàm dùng Proxy CodeTabs lách mọi tường lửa Cloudflare
+  // Dùng proxy trung chuyển ẩn danh
   const fetchHTML = async (url) => {
     try {
-      const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${url}`;
-      const response = await fetch(proxyUrl);
+      const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${url}`);
       if (!response.ok) return '';
       return await response.text();
-    } catch (e) {
-      return '';
-    }
+    } catch (e) { return ''; }
   };
 
   try {
-    // 1. USD CHỢ ĐEN (Webgia) - Trả lại đúng ý anh Tú!
+    // 1. VÀNG SJC (Lách qua đường hầm XML chính thức, xuyên thủng mọi Cloudflare)
     try {
-      const usdHtml = await fetchHTML('https://webgia.com/ty-gia/usd-cho-den/');
-      // Quét các số tỷ giá chợ đen (VD: 25.120, 26.500, 27.200)
-      const usdMatches = usdHtml.match(/2[5678][.,]\d{3}/g);
-      if (usdMatches && usdMatches.length >= 2) {
-        usd = usdMatches[1].replace(',', '.'); // Lấy số thứ 2 (Bán Ra)
-      } else if (usdMatches) {
-        usd = usdMatches[0].replace(',', '.');
+      const sjcXml = await fetchHTML('https://sjc.com.vn/xml/tygiavang.xml');
+      // Dò tìm trực tiếp thông số giá bán ra (sell="171.000" hoặc sell="85.000")
+      const sjcMatch = sjcXml.match(/sell="(\d{2,3}[.,]\d{3})"/);
+      if (sjcMatch) {
+        gold = sjcMatch[1].replace(',', '.');
       }
     } catch (e) {}
 
-    // 2. BẠC DOJI (Giữ nguyên vì đã chạy quá mượt)
+    // 2. BẠC DOJI (KHÓA MỤC TIÊU ĐÚNG DÒNG "1 LƯỢNG" - Không lấy số rác 5.9k nữa)
     try {
       const dojiHtml = await fetchHTML('https://giabac.doji.vn');
-      const dojiMatches = dojiHtml.match(/[2345][.,]\d{3}/g);
-      if (dojiMatches && dojiMatches.length >= 2) {
-        silver = dojiMatches[1].replace(',', '.');
-      } else if (dojiMatches) {
-        silver = dojiMatches[0].replace(',', '.');
+      const idx = dojiHtml.indexOf('99.9 - 1 LƯỢNG'); // Bắt buộc phải tìm thấy dòng này
+      if (idx !== -1) {
+        const block = dojiHtml.substring(idx, idx + 200); // Khoanh vùng 200 ký tự xung quanh
+        const dojiMatches = block.match(/[234][.,]\d{3}/g);
+        if (dojiMatches && dojiMatches.length >= 2) {
+          silver = dojiMatches[1].replace(',', '.'); // Lấy số thứ 2 (Bán ra)
+        } else if (dojiMatches) {
+          silver = dojiMatches[0].replace(',', '.');
+        }
       }
     } catch (e) {}
 
-    // 3. VÀNG SJC (Web chính chủ) - Trị tận gốc số hàng triệu
+    // 3. USD CHỢ ĐEN (Đổi nguồn sang "chogia.vn", bỏ qua "webgia.com" vì bảo mật quá gắt)
     try {
-      const sjcHtml = await fetchHTML('https://sjc.com.vn/gia-vang-online');
-      const idx = sjcHtml.indexOf('1L, 10L'); // Tìm đúng dòng 1 Lượng
-      if (idx !== -1) {
-        const block = sjcHtml.substring(idx, idx + 300);
-        // SJC ghi là 171,000,000. Lệnh này sẽ chẻ lấy đúng "171,000" ở khúc đầu!
-        const sjcMatches = block.match(/1[6789]\d[.,]\d{3}/g);
-        if (sjcMatches && sjcMatches.length >= 2) {
-          gold = sjcMatches[1].replace(',', '.'); // Ép thành 171.000
-        } else if (sjcMatches) {
-          gold = sjcMatches[0].replace(',', '.');
-        }
+      const usdHtml = await fetchHTML('https://chogia.vn/ty-gia-ngoai-te/usd-cho-den/');
+      const usdMatches = usdHtml.match(/2[5678][.,]\d{3}/g); // Tìm đầu 25, 26, 27
+      if (usdMatches && usdMatches.length >= 2) {
+        usd = usdMatches[1].replace(',', '.'); // Lấy số thứ 2 (Bán ra)
+      } else if (usdMatches) {
+        usd = usdMatches[0].replace(',', '.');
       }
     } catch (e) {}
 
