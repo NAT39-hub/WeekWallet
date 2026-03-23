@@ -4,8 +4,8 @@ import { TrendingUp, Coins, DollarSign, RefreshCw } from 'lucide-react';
 export const MarketData: React.FC = () => {
   // Đặt giá trị mặc định là những con số đẹp nhất hiện tại của anh Tú
   const [rates, setRates] = useState({
-    gold: '171.000', 
-    silver: '2.845',
+    gold: '9999', 
+    silver: '8888',
     usd: '...' 
   });
   const [isFetching, setIsFetching] = useState(false);
