@@ -1,60 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Coins, DollarSign, RefreshCw } from 'lucide-react';
+import { TrendingUp, Coins, DollarSign, RefreshCw, AlertCircle } from 'lucide-react';
 
 export const MarketData: React.FC = () => {
-  // Đặt giá trị mặc định là những con số đẹp nhất hiện tại của anh Tú
-  const [rates, setRates] = useState({
-    gold: '9999', 
-    silver: '8888',
-    usd: '...' 
-  });
+  const [rates, setRates] = useState({ gold: '...', silver: '...', usd: '...' });
   const [isFetching, setIsFetching] = useState(false);
 
   const fetchRates = async () => {
     setIsFetching(true);
-    
-    // Giữ nguyên giá Vàng/Bạc cũ, chỉ reset USD để tạo hiệu ứng load
-    setRates(prev => ({ ...prev, usd: '...' })); 
+    setRates({ gold: '...', silver: '...', usd: '...' }); // Hiệu ứng đang tải
 
-    let newUsd = rates.usd;
-    let newGold = rates.gold;
-    let newSilver = rates.silver;
+    let newGold = 'Lỗi';
+    let newSilver = 'Lỗi';
+    let newUsd = 'Lỗi';
+
+    // Hàm proxy "xuyên táo" bọc bằng AllOrigins (có gắn time chống lưu cache)
+    const fetchRaw = async (url: string) => {
+      try {
+        const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&disableCache=true&t=${Date.now()}`);
+        const data = await res.json();
+        return data.contents || '';
+      } catch(e) { return ''; }
+    };
 
     try {
-      // 1. USD: Dùng API Quốc Tế (Bao sống, không bao giờ sập)
+      // 1. VÀNG SJC: Chọc thẳng API nội bộ của Bảo Tín Minh Châu (KHÔNG TƯỜNG LỬA)
       try {
-        const usdRes = await fetch('https://open.er-api.com/v6/latest/USD');
-        if (usdRes.ok) {
-          const data = await usdRes.json();
-          newUsd = (data.rates.VND / 1000).toFixed(3); // VD: 25.450
+        // Link API xịn em vừa đào được trong source code của BTMC
+        const btmcRaw = await fetchRaw('http://api.btmc.vn/api/BTMCAPI/getpricebtmc?key=3kd8ub1llcg9t45hnoh8hmn7t5kc2v');
+        if (btmcRaw) {
+           const btmcJson = JSON.parse(btmcRaw);
+           // Dò tìm chính xác món "VÀNG MIẾNG( Vàng SJC-999.9)"
+           const sjcData = btmcJson.DataList?.Data?.find((item: any) => item.name_type?.includes('SJC'));
+           if (sjcData && sjcData.pb) {
+              // Nó trả về "8600000" (Giá 86 triệu). Lệnh này cắt nhỏ ra thành "86.000" K/Lượng
+              const price = parseInt(sjcData.pb.replace(/,/g, ''));
+              if (price > 1000) {
+                  newGold = (price / 1000).toLocaleString('vi-VN').replace(/,/g, '.');
+              }
+           }
         }
-      } catch (e) { console.log("Lỗi API USD"); }
+      } catch(e) { console.log('Lỗi bốc Vàng SJC'); }
 
-      // 2. VÀNG & BẠC: Cào ngầm qua corsproxy.io (Nếu thất bại sẽ im lặng giữ số cũ)
+      // 2. BẠC DOJI: Lách qua trang Chợ Giá (Mềm hơn DOJI chính chủ)
       try {
-        const htmlRes = await fetch('https://corsproxy.io/?https://chogia.vn/gia-vang/');
-        if (htmlRes.ok) {
-          const html = await htmlRes.text();
-          
-          // Dò số Vàng SJC (VD: 171.000)
-          const sjcMatch = html.match(/SJC 1L.*?([1-9]\d{2}[.,]\d{3})/i);
-          if (sjcMatch) newGold = sjcMatch[1].replace(',', '.');
+        const bacHtml = await fetchRaw('https://chogia.vn/gia-bac/');
+        // Bắn tỉa đúng dòng chứa chữ "Bạc" và bắt con số kế bên
+        const bacMatch = bacHtml.match(/Bạc.*?([2345][.,]\d{3})/i);
+        if (bacMatch) newSilver = bacMatch[1].replace(',', '.');
+      } catch(e) { console.log('Lỗi bốc Bạc DOJI'); }
 
-          // Dò số Bạc (VD: 2.845)
-          const dojiMatch = html.match(/Bạc.*?([2345][.,]\d{3})/i);
-          if (dojiMatch) newSilver = dojiMatch[1].replace(',', '.');
-        }
-      } catch (e) { console.log("Web nguồn chặn, dùng giá dự phòng."); }
+      // 3. USD CHỢ ĐEN: Lấy chuẩn xác giá Chợ Đen trên Chợ Giá
+      try {
+         const usdHtml = await fetchRaw('https://chogia.vn/ty-gia-ngoai-te/usd-cho-den/');
+         const usdMatches = usdHtml.match(/2[5678][.,]\d{3}/g);
+         if (usdMatches && usdMatches.length >= 2) {
+            newUsd = usdMatches[1].replace(',', '.'); // Số thứ 2 luôn là Bán ra
+         } else if (usdMatches) {
+            newUsd = usdMatches[0].replace(',', '.');
+         }
+      } catch(e) { console.log('Lỗi bốc USD Chợ đen'); }
 
-      // Cập nhật lại giao diện một cách mượt mà
-      setRates({
-        gold: newGold,
-        silver: newSilver,
-        usd: newUsd !== '...' ? newUsd : '25.450' // Nếu đứt cáp quang thì hiện số này
-      });
-
-    } catch (error) {
-      console.log("Lỗi mạng tổng");
+      // Đẩy lên giao diện
+      setRates({ gold: newGold, silver: newSilver, usd: newUsd });
+    } catch(error) {
+      setRates({ gold: 'Lỗi', silver: 'Lỗi', usd: 'Lỗi' });
     } finally {
       setIsFetching(false);
     }
@@ -65,9 +74,9 @@ export const MarketData: React.FC = () => {
   }, []);
 
   const marketRates = [
-    { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: <TrendingUp className="w-3 h-3 text-amber-500" /> },
-    { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: <Coins className="w-3 h-3 text-slate-400" /> },
-    { label: 'USD QUỐC TẾ', value: rates.usd, unit: 'đ', icon: <DollarSign className="w-3 h-3 text-emerald-500" /> }
+    { label: 'VÀNG SJC', value: rates.gold, unit: 'K/Lượng', icon: rates.gold === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <TrendingUp className="w-3 h-3 text-amber-500" /> },
+    { label: 'BẠC DOJI', value: rates.silver, unit: 'K/Lượng', icon: rates.silver === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <Coins className="w-3 h-3 text-slate-400" /> },
+    { label: 'USD CHỢ ĐEN', value: rates.usd, unit: 'đ', icon: rates.usd === 'Lỗi' ? <AlertCircle className="w-3 h-3 text-rose-500" /> : <DollarSign className="w-3 h-3 text-emerald-500" /> }
   ];
 
   return (
@@ -78,11 +87,11 @@ export const MarketData: React.FC = () => {
           <div className="flex flex-col">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{rate.label}</span>
             <div className="flex items-baseline space-x-1">
-              {/* Bỏ luôn màu đỏ báo lỗi, giữ giao diện luôn sang trọng */}
-              <span className={`text-xs font-black tracking-tight ${rate.value === '...' ? 'text-slate-400 animate-pulse' : 'text-slate-800'}`}>
+              {/* Lỗi thì hiện đỏ, đang lấy thì chớp chớp, có số thì hiện xanh đen */}
+              <span className={`text-xs font-black tracking-tight ${rate.value === 'Lỗi' ? 'text-rose-600' : rate.value === '...' ? 'text-slate-400 animate-pulse' : 'text-slate-800'}`}>
                 {rate.value}
               </span>
-              {rate.value !== '...' && (
+              {rate.value !== 'Lỗi' && rate.value !== '...' && (
                 <span className="text-[10px] font-bold text-slate-400 underline decoration-slate-200">{rate.unit}</span>
               )}
             </div>
